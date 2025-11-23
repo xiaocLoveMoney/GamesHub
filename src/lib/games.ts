@@ -1,0 +1,47 @@
+
+import { 
+  LayoutDashboard, 
+  Gamepad2, 
+  BrainCircuit, 
+  Ghost, 
+  Keyboard, 
+  Activity, 
+  CircleDashed, 
+  Trophy, 
+  Zap,
+  Hash,
+  Bomb,
+  Grid3X3,
+  Apple,
+  MonitorPlay,
+  Calculator,
+  BoxSelect,
+  Scissors,
+  Baby,
+  Map,
+  Cookie,
+  CircleDot
+} from 'lucide-react';
+
+export const games = [
+  { id: 'tic-tac-toe', name: '井字棋', icon: Grid3X3 },
+  { id: 'memory-match', name: '记忆翻牌', icon: BrainCircuit },
+  { id: 'whack-a-mole', name: '打地鼠', icon: Ghost },
+  { id: 'simon-says', name: '西蒙游戏', icon: Activity },
+  { id: 'typing-speed', name: '打字游戏', icon: Keyboard },
+  { id: 'snake', name: '贪吃蛇', icon: Zap },
+  { id: 'pong', name: '乒乓球', icon: CircleDashed },
+  { id: 'breakout', name: '打砖块', icon: BoxSelect },
+  { id: 'flappy-bird', name: '像素鸟', icon: Activity }, // 替换暂无图标
+  { id: 'dino-run', name: '小恐龙', icon: MonitorPlay },
+  { id: '2048', name: '2048', icon: Hash },
+  { id: 'minesweeper', name: '扫雷', icon: Bomb },
+  { id: 'sudoku', name: '数独', icon: Grid3X3 },
+  { id: 'klotski', name: '华容道', icon: BoxSelect },
+  { id: 'tetris', name: '俄罗斯方块', icon: Calculator },
+  { id: 'fruit-ninja', name: '切水果', icon: Scissors },
+  { id: 'game-of-life', name: '生命游戏', icon: Baby },
+  { id: 'maze', name: '迷宫生成', icon: Map },
+  { id: 'pacman', name: '吃豆人', icon: Cookie },
+  { id: 'agar-io', name: '大球吃小球', icon: CircleDot },
+];

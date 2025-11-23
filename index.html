@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Creator</title>
+    <!-- 你的 Vue 项目 CSS -->
+    <link href="main.css" rel="stylesheet">
+
+    <style>
+      /* * ==========================================
+       * 独立加载层样式 (Isolated Loader CSS)
+       * ==========================================
+       * 这里的样式只作用于 #initial-loading-wrapper 及其子元素，
+       * 绝对不会影响 Vue 项目内的 body, #app 或其他组件。
+       */
+      
+      #initial-loading-wrapper {
+        /* 强制全屏覆盖 */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        
+        /* 样式隔离：将背景和字体仅限制在这个容器内 */
+        background-color: #0f172a;
+        color: #ffffff;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        
+        /* 布局居中 */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        
+        /* 层级最高，确保遮住 Vue 的挂载点 */
+        z-index: 99999;
+        
+        /* 过渡效果 */
+        transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        
+        /* 防止由于浏览器默认样式导致的边距问题，虽然 body 可能有 margin，但 fixed 定位会忽略它 */
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* 加载完成状态 */
+      #initial-loading-wrapper.loader-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      /* 这是一个独立的 BEM 风格命名，防止类名冲突 */
+      .initial-loader__circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        position: relative;
+        background: conic-gradient(
+          from 0deg, 
+          transparent 0%, 
+          transparent 40%, 
+          #3b82f6 100%
+        );
+        /* 使用带前缀的动画名称 */
+        animation: initial-loader-spin 1s linear infinite;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+      }
+
+      .initial-loader__circle::before {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        right: 3px;
+        bottom: 3px;
+        background: #0f172a; /* 必须与 wrapper 背景一致 */
+        border-radius: 50%;
+      }
+
+      .initial-loader__text {
+        margin-top: 20px;
+        font-size: 14px;
+        letter-spacing: 2px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        animation: initial-loader-pulse 2s ease-in-out infinite;
+      }
+
+      /* 动画名称加前缀，防止污染全局命名空间 */
+      @keyframes initial-loader-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes initial-loader-pulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+    </style>
+  </head>
+  
+  <script>
+    try {
+      new EventSource('/esbuild').addEventListener('change', () =>
+        location.reload()
+      )
+    } catch (e) {}
+  </script>
+
+  <body>
+    <!-- 
+      1. 隔离的 Loading 结构 
+      注意：它在 #app 之外，互不干扰
+    -->
+    <div id="initial-loading-wrapper">
+      <div class="initial-loader__circle"></div>
+      <div class="initial-loader__text">Loading Creator</div>
+    </div>
+
+    <!-- 2. Vue 挂载点 -->
+    <div id="app"></div>
+    
+    <!-- 你的 main.js -->
+    <script src="main.js"></script>
+
+    <!-- 
+      [演示脚本] 
+      这段 JS 仅用于预览效果，实际开发中你的 main.js 会处理这部分逻辑 
+    -->
+      <script :src="main.js"></script>
+    <script>
+      window.addEventListener('load', () => {
+        // 模拟 Vue 初始化过程
+        setTimeout(() => {
+          const loader = document.getElementById('initial-loading-wrapper');
+          if (loader) {
+            loader.classList.add('loader-hidden');
+            // 动画结束后彻底移除 DOM，保持页面纯净
+            setTimeout(() => {
+              loader.remove();
+            }, 600);
+          }
+        }, 1500);
+      });
+    </script>
+  </body>
+</html>
