@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { RefreshCw, Trophy } from 'lucide-react';
+import { RefreshCw, Trophy, Play } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import PageTransition from '../../components/PageTransition';
 
 export default function DinoRun() {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
-  const state = useRef({
+  const gameState = useRef({
     dino: { y: 0, dy: 0, w: 40, h: 40, grounded: true },
     obstacles: [] as { x: number; w: number; h: number }[],
     gameSpeed: 3,
@@ -22,6 +26,30 @@ export default function DinoRun() {
     animationId: 0
   });
 
+  const resetGame = () => {
+    gameState.current.dino.y = 0;
+    gameState.current.dino.dy = 0;
+    gameState.current.dino.grounded = true;
+    gameState.current.obstacles = [];
+    gameState.current.frameCount = 0;
+    gameState.current.gameSpeed = 3;
+    setScore(0);
+    setGameOver(false);
+    setCountdown(3); // Start countdown
+  };
+
+  // Countdown Effect
+  useEffect(() => {
+    if (countdown === null) return;
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(c => c! - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setCountdown(null);
+      setIsPlaying(true);
+    }
+  }, [countdown]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -31,7 +59,7 @@ export default function DinoRun() {
     canvas.width = 600;
     canvas.height = 300;
 
-    const s = state.current;
+    const s = gameState.current;
 
     // 🌵 障碍物生成逻辑
     const spawnObstacle = () => {
@@ -179,27 +207,18 @@ export default function DinoRun() {
     }
 
     return () => cancelAnimationFrame(s.animationId);
-  }, [isPlaying]);
+  }, [isPlaying, countdown]);
 
-  const handleJump = () => {
-    if (state.current.dino.grounded && isPlaying) {
-      state.current.dino.grounded = false;
-      state.current.dino.dy = state.current.jumpForce;
-    } else if (!isPlaying && !gameOver) {
-      setIsPlaying(true);
+  const jump = () => {
+    if (!isPlaying && !gameOver && countdown === null) {
+      // Start countdown if not playing
+      setCountdown(3);
+      return;
     }
-  };
 
-  const resetGame = () => {
-    state.current.dino.y = 0;
-    state.current.dino.dy = 0;
-    state.current.dino.grounded = true;
-    state.current.obstacles = [];
-    state.current.frameCount = 0;
-    state.current.gameSpeed = 3; // 🐢 起始速度更低
-    setScore(0);
-    setGameOver(false);
-    setIsPlaying(true);
+    if (!isPlaying || !gameState.current.dino.grounded) return;
+    gameState.current.dino.dy = gameState.current.jumpForce;
+    gameState.current.dino.grounded = false;
   };
 
   useEffect(() => {
@@ -207,70 +226,113 @@ export default function DinoRun() {
       if (e.code === 'Space' || e.code === 'ArrowUp') {
         e.preventDefault();
         if (gameOver) resetGame();
-        else handleJump();
+        else jump(); // Call the jump useCallback
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [gameOver, isPlaying]);
+  }, [gameOver, isPlaying, jump]); // Added jump to dependencies
 
   return (
     <PageTransition>
-      <div className="flex flex-col items-center py-10 min-h-[calc(100vh-100px)]">
-        <div className="w-full max-w-3xl bg-white p-2 rounded-xl shadow-sm border border-slate-200">
-          <div className="flex justify-between items-center px-4 py-2 font-mono text-slate-600">
-            <div className="text-xl font-bold flex items-center gap-2">
-              <span className="text-slate-800">DINO RUN 🦕</span>
-            </div>
-            <div className="flex gap-6">
-              <div className="flex items-center gap-2 text-slate-400">
-                <Trophy size={16} />
-                <span>HI {highScore.toString().padStart(5, '0')}</span>
+      <div className="flex flex-col items-center py-10 min-h-[calc(100vh-100px)] select-none">
+        <div className="w-full max-w-2xl px-4">
+
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+              <span className="text-4xl">🦖</span> Dino Run
+            </h1>
+            <div className="flex gap-6 text-right">
+              <div>
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('common.score')}</div>
+                <div className="text-2xl font-mono font-bold text-slate-800">{Math.floor(score)}</div>
               </div>
-              <div className="font-bold text-slate-800 text-xl">
-                {score.toString().padStart(5, '0')}
+              <div>
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('common.high_score')}</div>
+                <div className="text-2xl font-mono font-bold text-slate-400">{Math.floor(highScore)}</div>
               </div>
             </div>
           </div>
 
+          {/* Game Canvas */}
           <div
-            className="relative w-full aspect-[2/1] bg-white border-t border-b border-slate-100 cursor-pointer touch-manipulation overflow-hidden select-none"
-            onClick={gameOver ? resetGame : handleJump}
+            className="relative bg-white rounded-xl shadow-xl overflow-hidden border-4 border-slate-800 cursor-pointer"
+            onClick={gameOver ? resetGame : jump} // Use jump for click handler
           >
-            <canvas ref={canvasRef} className="w-full h-full block" />
+            <canvas
+              ref={canvasRef}
+              width={gameState.current.width} // Use state ref for width
+              height={gameState.current.height} // Use state ref for height
+              className="w-full h-auto block bg-slate-50"
+            />
 
-            {!isPlaying && !gameOver && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-slate-800/80 text-white px-6 py-3 rounded-full animate-pulse">
-                  按空格或点击屏幕开始
-                </div>
-              </div>
-            )}
-
-            {gameOver && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 backdrop-blur-[1px] z-10">
-                <div className="text-3xl font-bold text-slate-800 mb-4">GAME OVER</div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    resetGame();
-                  }}
-                  className="p-4 bg-green-500 text-white rounded-full hover:scale-110 transition-transform shadow-lg"
+            {/* Overlays */}
+            <AnimatePresence>
+              {/* Game Over */}
+              {gameOver && (
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center text-white"
                 >
-                  <RefreshCw size={24} />
-                </button>
-              </div>
-            )}
+                  <h2 className="text-4xl font-black mb-2">GAME OVER</h2>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); resetGame(); }}
+                    className="mt-4 px-6 py-2 bg-white text-slate-900 rounded-full font-bold hover:scale-105 transition-transform flex items-center gap-2"
+                  >
+                    <RefreshCw size={20} /> Try Again
+                  </button>
+                </motion.div>
+              )}
+
+              {/* Start Screen */}
+              {!isPlaying && !gameOver && countdown === null && (
+                <motion.div
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="absolute inset-0 bg-black/20 flex items-center justify-center"
+                >
+                  <div className="bg-white/90 backdrop-blur px-6 py-4 rounded-2xl shadow-lg flex flex-col items-center">
+                    <p className="text-slate-500 font-medium mb-2">Press Space or Click to Jump</p>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); jump(); }} // Use jump to start countdown
+                      className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center gap-2 animate-pulse"
+                    >
+                      <Play size={20} fill="currentColor" /> {t('common.start_game')}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Countdown Overlay */}
+              {countdown !== null && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.5 }}
+                  key={countdown}
+                  className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+                >
+                  <motion.span
+                    className="text-8xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1.2, opacity: 1 }}
+                    exit={{ scale: 2, opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {countdown === 0 ? "GO!" : countdown}
+                  </motion.span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          <div className="p-4 text-center text-xs text-slate-400">
-            <span className="hidden sm:inline">
-              <kbd className="px-2 py-1 bg-slate-100 rounded border border-slate-300 mx-1">Space</kbd> 跳跃
-            </span>
-            <span className="sm:hidden">点击屏幕跳跃</span>
-          </div>
+          <p className="text-center text-slate-400 mt-6 text-sm">
+            Tip: The game gets faster as you progress!
+          </p>
+
         </div>
       </div>
     </PageTransition>
   );
 }
+

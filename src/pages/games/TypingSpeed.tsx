@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { RefreshCw, Keyboard, Zap, Target } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import PageTransition from '../../components/PageTransition';
 import { cn } from '../../lib/utils';
 
@@ -16,6 +17,7 @@ const SENTENCES = [
 ];
 
 export default function TypingSpeed() {
+  const { t } = useTranslation();
   const [text, setText] = useState("");
   const [input, setInput] = useState("");
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -95,16 +97,16 @@ export default function TypingSpeed() {
           <div className="flex items-center justify-between mb-12">
             <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
               <span className="p-2 bg-indigo-100 text-indigo-600 rounded-lg"><Keyboard size={20} /></span>
-              打字测速
+              {t('games.typing-speed')}
             </h2>
             
             <div className="flex gap-6">
               <div className="text-center">
-                 <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">WPM</div>
+                 <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('common.wpm')}</div>
                  <div className="text-2xl font-mono font-bold text-slate-800">{wpm > 0 ? wpm : '-'}</div>
               </div>
               <div className="text-center">
-                 <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">准确率</div>
+                 <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">{t('common.accuracy')}</div>
                  <div className="text-2xl font-mono font-bold text-slate-800">{accuracy}%</div>
               </div>
             </div>
@@ -151,7 +153,7 @@ export default function TypingSpeed() {
             {!isFocused && !endTime && (
                <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px] rounded-3xl">
                   <span className="text-slate-400 font-medium flex items-center gap-2">
-                    <Target size={16} /> 点击此处开始输入
+                    <Target size={16} /> {t('common.click_to_focus')}
                   </span>
                </div>
             )}

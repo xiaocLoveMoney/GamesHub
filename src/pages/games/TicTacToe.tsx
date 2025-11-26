@@ -8,7 +8,10 @@ import { cn } from '../../lib/utils';
 type Player = 'X' | 'O';
 type SquareValue = Player | null;
 
+import { useTranslation } from 'react-i18next';
+
 export default function TicTacToe() {
+  const { t } = useTranslation();
   const [squares, setSquares] = useState<SquareValue[]>(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
   const [winner, setWinner] = useState<Player | null>(null);
@@ -31,7 +34,7 @@ export default function TicTacToe() {
 
   const handleClick = (i: number) => {
     if (squares[i] || winner) return;
-    
+
     const nextSquares = squares.slice();
     nextSquares[i] = xIsNext ? 'X' : 'O';
     setSquares(nextSquares);
@@ -53,32 +56,32 @@ export default function TicTacToe() {
     setWinningLine(null);
   };
 
-  const status = winner 
-    ? `获胜者: ${winner}` 
-    : squares.every(Boolean) 
-      ? '平局' 
-      : `下一步: ${xIsNext ? 'X' : 'O'}`;
+  const status = winner
+    ? `${t('common.winner')}: ${winner}`
+    : squares.every(Boolean)
+      ? t('common.draw')
+      : `${t('common.next_player')}: ${xIsNext ? 'X' : 'O'}`;
 
   return (
     <PageTransition>
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)]">
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 max-w-md w-full text-center">
-          
+
           <div className="flex items-center justify-between mb-8">
-             <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-               <span className="bg-indigo-100 text-indigo-600 p-2 rounded-lg">#</span> 井字棋
-             </h2>
-             <div className="text-sm font-medium px-4 py-1.5 bg-slate-100 rounded-full text-slate-600">
-               {status}
-             </div>
+            <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+              <span className="bg-indigo-100 text-indigo-600 p-2 rounded-lg">#</span> {t('games.tic-tac-toe')}
+            </h2>
+            <div className="text-sm font-medium px-4 py-1.5 bg-slate-100 rounded-full text-slate-600">
+              {status}
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-8 mx-auto w-fit">
             {squares.map((square, i) => (
-              <Square 
-                key={i} 
-                value={square} 
-                onClick={() => handleClick(i)} 
+              <Square
+                key={i}
+                value={square}
+                onClick={() => handleClick(i)}
                 isWinningSquare={winningLine?.includes(i)}
               />
             ))}
@@ -90,16 +93,16 @@ export default function TicTacToe() {
             onClick={resetGame}
             className="flex items-center justify-center gap-2 w-full py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 transition-colors"
           >
-            <RefreshCw size={18} /> 重新开始
+            <RefreshCw size={18} /> {t('common.reset')}
           </motion.button>
 
           {winner && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="mt-6 p-4 bg-yellow-50 text-yellow-700 rounded-xl flex items-center justify-center gap-2"
             >
-              <Trophy size={20} /> 恭喜 {winner} 赢得胜利！
+              <Trophy size={20} /> {t('common.winner')}: {winner}!
             </motion.div>
           )}
         </div>

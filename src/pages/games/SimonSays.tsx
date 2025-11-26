@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { Play, RefreshCw, BrainCircuit } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import PageTransition from '../../components/PageTransition';
 import { cn } from '../../lib/utils';
 
@@ -9,12 +10,13 @@ type Color = 'green' | 'red' | 'yellow' | 'blue';
 const COLORS: Color[] = ['green', 'red', 'yellow', 'blue'];
 
 export default function SimonSays() {
+  const { t } = useTranslation();
   const [sequence, setSequence] = useState<Color[]>([]);
   const [userSequence, setUserSequence] = useState<Color[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isUserTurn, setIsUserTurn] = useState(false);
   const [activeColor, setActiveColor] = useState<Color | null>(null);
-  const [message, setMessage] = useState("点击开始游戏");
+  const [message, setMessage] = useState(t('common.click_to_start'));
   const [score, setScore] = useState(0);
 
   const isPlayingRef = useRef(false);
@@ -25,13 +27,13 @@ export default function SimonSays() {
     setScore(0);
     setIsPlaying(true);
     isPlayingRef.current = true;
-    setMessage("仔细看...");
+    setMessage(t('common.watch_carefully'));
     nextRound([]); // 传入空数组开始第一轮
   };
 
   const nextRound = async (currentSeq: Color[]) => {
     setIsUserTurn(false);
-    setMessage("记忆颜色顺序...");
+    setMessage(t('common.remember_color_order'));
     
     // 增加一个新颜色
     const nextColor = COLORS[Math.floor(Math.random() * 4)];
@@ -53,7 +55,7 @@ export default function SimonSays() {
     
     setIsUserTurn(true);
     setUserSequence([]);
-    setMessage("轮到你了！");
+    setMessage(t('common.your_turn'));
   };
 
   const handleColorClick = (color: Color) => {
@@ -78,7 +80,7 @@ export default function SimonSays() {
     if (newUserSeq.length === sequence.length) {
       setScore(s => s + 1);
       setIsUserTurn(false);
-      setMessage("正确！准备下一轮...");
+      setMessage(t('common.correct') + '! ' + t('common.next_round'));
       setTimeout(() => nextRound(sequence), 500);
     }
   };
@@ -87,7 +89,7 @@ export default function SimonSays() {
     setIsPlaying(false);
     isPlayingRef.current = false;
     setIsUserTurn(false);
-    setMessage(`游戏结束！得分: ${score}`);
+    setMessage(t('common.game_over') + '! ' + t('common.score') + ': ' + score);
   };
 
   return (
@@ -97,7 +99,7 @@ export default function SimonSays() {
         {/* 头部 */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-slate-800 flex items-center justify-center gap-2 mb-2">
-             <BrainCircuit size={24} className="text-indigo-500" /> 西蒙游戏
+             <BrainCircuit size={24} className="text-indigo-500" /> {t('games.simon-says')}
           </h2>
           <p className={cn(
             "text-lg font-medium transition-colors",
@@ -129,7 +131,7 @@ export default function SimonSays() {
              ) : (
                <div className="text-center">
                  <div className="text-2xl font-mono font-bold text-white">{score}</div>
-                 <div className="text-[8px] text-slate-400 uppercase">Score</div>
+                 <div className="text-[8px] text-slate-400 uppercase">{t('common.score')}</div>
                </div>
              )}
           </div>
@@ -143,7 +145,7 @@ export default function SimonSays() {
             onClick={startGame}
             className="flex items-center gap-2 px-6 py-2 bg-white border border-slate-200 text-slate-700 rounded-full hover:bg-slate-50 transition-colors shadow-sm"
           >
-            <RefreshCw size={16} /> 重玩
+            <RefreshCw size={16} /> {t('common.replay')}
           </motion.button>
         )}
       </div>

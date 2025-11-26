@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Play, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import PageTransition from '../../components/PageTransition';
 import { AnimatePresence, motion } from 'motion/react';
 
 export default function FlappyBird() {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // 1. 增加 'countdown' 状态
   const [gameStatus, setGameStatus] = useState<'start' | 'countdown' | 'playing' | 'gameover'>('start');
@@ -242,14 +244,14 @@ export default function FlappyBird() {
                  <div className="absolute inset-0 bg-black/40 rounded-3xl backdrop-blur-[2px] animate-in fade-in duration-300 flex flex-col items-center justify-center pointer-events-auto">
                     <div className="relative bg-[#ded895] p-1 rounded-xl border-2 border-[#523e24] shadow-xl mb-6 animate-in zoom-in duration-300 w-64">
                         <div className="bg-[#dcd37b] border border-[#9e8c46] rounded-lg p-4 flex flex-col gap-4">
-                            <h2 className="text-2xl font-black text-[#e65f2a] text-center uppercase tracking-wider drop-shadow-sm">Game Over</h2>
+                            <h2 className="text-2xl font-black text-[#e65f2a] text-center uppercase tracking-wider drop-shadow-sm">{t('common.game_over')}</h2>
                             <div className="flex justify-between items-end px-2">
                                <div className="flex flex-col items-center">
-                                  <span className="text-[10px] font-bold text-[#e65f2a] uppercase tracking-widest">Score</span>
+                                  <span className="text-[10px] font-bold text-[#e65f2a] uppercase tracking-widest">{t('common.score')}</span>
                                   <span className="text-3xl font-mono font-bold text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.2)]">{score}</span>
                                </div>
                                <div className="flex flex-col items-center">
-                                  <span className="text-[10px] font-bold text-[#c68c28] uppercase tracking-widest">Best</span>
+                                  <span className="text-[10px] font-bold text-[#c68c28] uppercase tracking-widest">{t('common.best')}</span>
                                   <span className="text-3xl font-mono font-bold text-white drop-shadow-[0_2px_0_rgba(0,0,0,0.2)]">{Math.max(score, highScore)}</span>
                                </div>
                             </div>
@@ -281,7 +283,7 @@ export default function FlappyBird() {
                         </div>
                     </button>
                     <div className="text-white font-bold text-lg animate-bounce drop-shadow-md">
-                        点击开始游戏
+                        {t('common.click_to_start')}
                     </div>
                  </div>
                )}

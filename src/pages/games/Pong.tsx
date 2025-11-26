@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Play, RefreshCw, Trophy } from 'lucide-react';
 import PageTransition from '../../components/PageTransition';
 
+import { useTranslation } from 'react-i18next';
+
 export default function Pong() {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [score, setScore] = useState({ player: 0, ai: 0 });
@@ -217,12 +220,12 @@ export default function Pong() {
                 {winner ? (
                   <div className="text-center animate-in fade-in zoom-in">
                     <Trophy size={48} className="mx-auto mb-4 text-yellow-400" />
-                    <h2 className="text-3xl font-bold mb-2">{winner === 'player' ? '你赢了！' : 'AI 获胜'}</h2>
+                    <h2 className="text-3xl font-bold mb-2">{winner === 'player' ? t('common.you_won') : t('common.ai_won')}</h2>
                     <button
                       onClick={startGame}
                       className="mt-6 px-8 py-3 bg-white text-slate-900 rounded-full font-bold hover:bg-slate-200 transition-colors flex items-center gap-2 mx-auto"
                     >
-                      <RefreshCw size={20} /> 再来一局
+                      <RefreshCw size={20} /> {t('common.play_again')}
                     </button>
                   </div>
                 ) : (
@@ -239,13 +242,13 @@ export default function Pong() {
             {/* 倒计时显示 */}
             {countdown !== null && (
               <div className="absolute inset-0 flex items-center justify-center text-white text-6xl font-bold z-20 animate-in fade-in zoom-in">
-                {countdown === 0 ? '开始！' : countdown}
+                {countdown === 0 ? 'GO!' : countdown}
               </div>
             )}
           </div>
 
           <p className="text-center text-sm text-slate-400 mt-6">
-            移动鼠标或在屏幕上滑动来控制左侧球拍。率先获得 5 分者获胜。
+            {t('common.pong_hint')}
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Eraser, RefreshCw, Trophy, Settings, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import PageTransition from '../../components/PageTransition';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -13,6 +14,7 @@ const DIFFICULTY_SETTINGS = {
 };
 
 export default function Sudoku() {
+  const { t } = useTranslation();
   // 核心状态
   const [board, setBoard] = useState<number[][]>([]); // 当前盘面
   const [initialBoard, setInitialBoard] = useState<number[][]>([]); // 初始盘面 (不可变)
