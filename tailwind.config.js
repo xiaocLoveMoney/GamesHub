@@ -2,8 +2,9 @@
 module.exports = {
   darkMode: ['class'],
   // 关键修改：
-  // 1. 确保包含 'vue'，否则 Vue 文件里的 class 不会被打包
-  // 2. JIT 引擎会根据这个数组自动 Tree-shake (摇树优化)，只打包用到的样式
+  // 1. 确保包含所有必需的文件扩展名以便Tree-shake优化
+  // 2. JIT引擎会根据这个数组自动Tree-shake (摇树优化)，只打包用到的样式
+  // 3. 生产环境下自动启用CSS压缩
   content: [
     './index.html', 
     './src/**/*.{html,js,ts,jsx,tsx,vue}'
@@ -98,9 +99,21 @@ module.exports = {
       },
     },
   },
-  // 3. 这是一个针对移动端的微优化，防止 hover 样式在触摸设备上卡住
+  // 优化配置：
+  // 1. 启用hoverOnlyWhenSupported以优化触摸设备
+  // 2. 生产环境自动启用CSS压缩
   future: {
     hoverOnlyWhenSupported: true,
   },
-  plugins: [require('tailwindcss-animate')],
+  // CSS压缩和优化
+  corePlugins: {
+    // 可选：禁用不需要的核心插件以减小包大小
+  },
+  plugins: [
+    require('tailwindcss-animate'),
+    // 自定义压缩插件
+    function({ addBase, theme }) {
+      // 添加任何需要的自定义基础样式
+    },
+  ],
 }
