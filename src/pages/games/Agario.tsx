@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { MousePointer2, Play, Pause, Crosshair } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import PageTransition from '../../components/PageTransition';
 
 type Blob = { x: number; y: number; r: number; color: string; isAI?: boolean; vx?: number; vy?: number; targetX?: number; targetY?: number };
@@ -8,6 +9,7 @@ type AIDifficulty = 'easy' | 'medium' | 'hard';
 
 
 export default function Agario() {
+  const { t } = useTranslation();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false); // 游戏是否已开始（包括暂停状态）
@@ -533,26 +535,26 @@ export default function Agario() {
           {/* Menu / Pause Overlay */}
           {(!isPlaying || isPaused) && countdown === 0 && (
             <div className="absolute inset-0 bg-white/70 flex flex-col items-center justify-center backdrop-blur-sm z-40">
-              <h1 className="text-5xl font-black text-slate-800 mb-2 drop-shadow-sm">Agar.io Clone</h1>
+              <h1 className="text-5xl font-black text-slate-800 mb-2 drop-shadow-sm">{t('games.agar-io')}</h1>
 
               {isPaused && isPlaying ? (
                 <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
-                  <h2 className="text-2xl font-bold text-slate-600 mb-6 bg-white px-4 py-1 rounded-full shadow-sm">PAUSED</h2>
+                  <h2 className="text-2xl font-bold text-slate-600 mb-6 bg-white px-4 py-1 rounded-full shadow-sm">{t('common.pause', { defaultValue: 'PAUSED' })}</h2>
                   <button onClick={() => { setIsPaused(false); requestLock(); }} className="px-10 py-4 bg-blue-500 text-white rounded-full font-bold shadow-lg hover:bg-blue-600 hover:scale-105 transition-all flex items-center gap-3">
-                    <Play fill="currentColor" /> Resume
+                    <Play fill="currentColor" /> {t('common.resume', { defaultValue: 'Resume' })}
                   </button>
-                  <p className="mt-4 text-slate-500 text-sm">Press Space or Click to Resume</p>
+                  <p className="mt-4 text-slate-500 text-sm">{t('games.agario-resume-hint', { defaultValue: 'Press Space or Click to Resume' })}</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
                   {/* AI Settings */}
                   <div className="bg-white/90 p-6 rounded-xl shadow-lg mb-6 w-80">
-                    <h3 className="text-lg font-bold text-slate-800 mb-4">AI Settings</h3>
+                    <h3 className="text-lg font-bold text-slate-800 mb-4">{t('common.ai_settings', { defaultValue: 'AI Settings' })}</h3>
 
                     {/* AI Count */}
                     <div className="mb-4">
                       <label className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-semibold text-slate-700">AI Players:</span>
+                        <span className="text-sm font-semibold text-slate-700">{t('common.ai_count', { defaultValue: 'AI Players:' })}</span>
                         <span className="text-lg font-bold text-blue-600">{aiCount}</span>
                       </label>
                       <input
@@ -571,7 +573,7 @@ export default function Agario() {
 
                     {/* AI Difficulty */}
                     <div>
-                      <label className="text-sm font-semibold text-slate-700 block mb-2">Difficulty:</label>
+                      <label className="text-sm font-semibold text-slate-700 block mb-2">{t('common.difficulty', { defaultValue: 'Difficulty:' })}</label>
                       <div className="flex gap-2">
                         {(['easy', 'medium', 'hard'] as AIDifficulty[]).map((diff) => (
                           <button
@@ -591,9 +593,9 @@ export default function Agario() {
                     </div>
                   </div>
 
-                  <p className="mb-8 text-slate-500 font-medium">Grow your cell by eating dots!</p>
+                  <p className="mb-8 text-slate-500 font-medium">{t('games.agario-hint', { defaultValue: 'Grow your cell by eating dots!' })}</p>
                   <button onClick={prepareGame} className="px-12 py-5 bg-blue-600 text-white rounded-full font-black text-xl shadow-xl hover:bg-blue-500 hover:scale-105 transition-all flex items-center gap-3">
-                    <Play fill="currentColor" /> START GAME
+                    <Play fill="currentColor" /> {t('common.start_game')}
                   </button>
                 </div>
               )}
@@ -602,13 +604,13 @@ export default function Agario() {
 
           {/* Score HUD */}
           <div className="absolute top-4 left-4 bg-white/80 backdrop-blur px-4 py-2 rounded-lg font-mono font-bold text-slate-700 border border-slate-200 shadow-sm pointer-events-none">
-            Size: {score}
+            {t('games.agario-size', { defaultValue: 'Size:' })} {score}
           </div>
 
           {/* Instructions HUD */}
           {isPlaying && !isPaused && countdown === 0 && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-slate-400/50 text-xs font-bold pointer-events-none">
-              PRESS SPACE TO PAUSE
+              {t('games.agario-pause-hint', { defaultValue: 'PRESS SPACE TO PAUSE' })}
             </div>
           )}
         </div>
@@ -616,11 +618,11 @@ export default function Agario() {
         <div className="mt-6 flex gap-6 text-slate-400 text-sm">
           <div className="flex items-center gap-2">
             <div className="p-1 bg-slate-200 rounded"><MousePointer2 size={16} /></div>
-            <span>Mouse to Move</span>
+            <span>{t('games.agario-move-hint', { defaultValue: 'Mouse to Move' })}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="p-1 bg-slate-200 rounded font-mono text-xs px-2">SPACE</div>
-            <span>Pause / Menu</span>
+            <span>{t('games.agario-space-hint', { defaultValue: 'Pause / Menu' })}</span>
           </div>
         </div>
       </div>

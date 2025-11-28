@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, LayoutDashboard, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { games } from '../lib/games';
+import { games, lanGames } from '../lib/games';
 import { cn } from '../lib/utils';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
@@ -87,6 +87,7 @@ export default function MainLayout() {
                   label={t('common.dashboard')}
                   isActive={isActive}
                   isCollapsed={isCollapsed}
+                  t={t}
                 />
               )}
             </NavLink>
@@ -97,16 +98,63 @@ export default function MainLayout() {
 
             {/* 游戏列表 */}
             {games.map((game) => (
-              <NavLink key={game.id} to={`/game/${game.id}`}>
-                {({ isActive }) => (
+              game.status === 'developing' ? (
+                <div key={game.id}>
                   <NavDurationItem
                     icon={game.icon}
                     label={t(`games.${game.id}`)}
-                    isActive={isActive}
+                    isActive={false}
                     isCollapsed={isCollapsed}
+                    status={game.status}
+                    t={t}
                   />
-                )}
-              </NavLink>
+                </div>
+              ) : (
+                <NavLink key={game.id} to={`/game/${game.id}`}>
+                  {({ isActive }) => (
+                    <NavDurationItem
+                      icon={game.icon}
+                      label={t(`games.${game.id}`)}
+                      isActive={isActive}
+                      isCollapsed={isCollapsed}
+                      status={game.status}
+                      t={t}
+                    />
+                  )}
+                </NavLink>
+              )
+            ))}
+
+            <div className={cn("mt-6 mb-2 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider transition-opacity", isCollapsed && "opacity-0 hidden")}>
+              {t('common.lan_games')}
+            </div>
+
+            {lanGames.map((game) => (
+              game.status === 'developing' ? (
+                <div key={game.id}>
+                  <NavDurationItem
+                    icon={game.icon}
+                    label={t(`games.${game.id}`)}
+                    isActive={false}
+                    isCollapsed={isCollapsed}
+                    status={game.status}
+                    t={t}
+                  />
+                </div>
+              ) : (
+                <NavLink key={game.id} to={`/game/${game.id}`}>
+                  {({ isActive }) => (
+                    <NavDurationItem
+                      icon={game.icon}
+                      label={t(`games.${game.id}`)}
+                      isActive={isActive}
+                      isCollapsed={isCollapsed}
+                      status={game.status}
+                      t={t}
+                    />
+                  )}
+                </NavLink>
+              )
             ))}
           </nav>
         </div>
@@ -213,10 +261,13 @@ export default function MainLayout() {
 /**
  * 导航项组件 - 处理复杂的交互样式
  */
-function NavDurationItem({ icon: Icon, label, isActive, isCollapsed }: { icon: any, label: string, isActive: boolean, isCollapsed: boolean }) {
+function NavDurationItem({ icon: Icon, label, isActive, isCollapsed, status, t }: { icon: any, label: string, isActive: boolean, isCollapsed: boolean, status?: string, t: any }) {
+  const isDeveloping = status === 'developing';
+
   return (
     <div className={cn(
       "relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group overflow-hidden whitespace-nowrap",
+      isDeveloping ? "opacity-60 cursor-not-allowed" : "",
       isActive ? "bg-indigo-50 text-indigo-600" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
     )}>
       {/* 激活状态下的左侧指示条 */}
@@ -232,17 +283,26 @@ function NavDurationItem({ icon: Icon, label, isActive, isCollapsed }: { icon: a
 
       <Icon size={22} className={cn("shrink-0 transition-transform duration-300", isActive && "scale-110")} />
 
-      <motion.span
-        animate={{ opacity: isCollapsed ? 0 : 1, width: isCollapsed ? 0 : 'auto' }}
-        className="font-medium text-sm overflow-hidden"
-      >
-        {label}
-      </motion.span>
+      <motion.div className="flex items-center gap-2">
+        <span className="font-medium text-sm overflow-hidden">
+          {label}
+        </span>
 
-      {/* 悬浮提示 (Tooltip)，仅在折叠时显示 (简化版，实际可用 shadcn Tooltip) */}
+        {isDeveloping && !isCollapsed && (
+          <motion.span
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-xs font-bold px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full whitespace-nowrap"
+          >
+            {t('lobby.in_development')}
+          </motion.span>
+        )}
+      </motion.div>
+
+      {/* 悬浮提示 (Tooltip)，仅在折叠时显示 */}
       {isCollapsed && (
         <div className="absolute left-full ml-4 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-          {label}
+          {label} {isDeveloping ? `- ${t('lobby.in_development')}` : ''}
         </div>
       )}
     </div>

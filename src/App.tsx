@@ -63,6 +63,11 @@ const router = createHashRouter(
         <Route path="game/pacman" lazy={lazyLoad(() => import('./pages/games/PacMan'))} />
         <Route path="game/agar-io" lazy={lazyLoad(() => import('./pages/games/Agario'))} />
 
+        {/* LAN Multiplayer */}
+        {/* <Route path="game/lan/dou-dizhu" lazy={lazyLoad(() => import('./pages/games/lan/DouDizhu'))} /> */}
+        <Route path="game/lan/zha-jinhua" lazy={lazyLoad(() => import('./pages/games/lan/ZhaJinhua'))} />
+        {/* <Route path="game/lan/agar-io-variant" lazy={lazyLoad(() => import('./pages/games/lan/AgarIoVariant'))} /> */}
+
         {/* Fallback */}
         <Route path="game/:id" element={<GamePlaceholder />} />
       </Route>
